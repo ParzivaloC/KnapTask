@@ -7,18 +7,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using KnapTask.Data;
 using KnapTask.Models;
+using KnapTask.Services;
 
 namespace KnapTask.Controllers
 {
     public class TaskItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly OptimizationService _optimizationService;
 
-        public TaskItemsController(ApplicationDbContext context)
+        public TaskItemsController(ApplicationDbContext context, OptimizationService optimizationService)
         {
             _context = context;
+            _optimizationService = optimizationService;
         }
-
+        
 
         // GET: TaskItems
         public async Task<IActionResult> Index()
@@ -153,6 +156,16 @@ namespace KnapTask.Controllers
         private bool TaskItemExists(int id)
         {
             return _context.TaskItems.Any(e => e.Id == id);
+        }
+
+        
+        public async Task<IActionResult> Plan(int hours = 8)
+        {
+            var allTasks = await _context.TaskItems.ToListAsync();
+            var optimizedTasks = _optimizationService.GetOptimizedPlan(allTasks, hours);
+            
+            ViewBag.MaxHours = hours;
+            return View(optimizedTasks);
         }
     }
 }

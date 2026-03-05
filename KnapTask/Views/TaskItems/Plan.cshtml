@@ -1,0 +1,41 @@
+﻿@model IEnumerable<KnapTask.Models.TaskItem>
+
+@{
+    ViewData["Title"] = "Мой идеальный план";
+}
+
+<h2>План на день (Лимит: @ViewBag.MaxHours ч.)</h2>
+
+<form asp-action="Plan" method="get" class="mb-4">
+    <div class="input-group" style="max-width: 300px;">
+        <input type="number" name="hours" class="form-control" placeholder="Сколько есть часов?" value="@ViewBag.MaxHours" />
+        <button type="submit" class="btn btn-primary">Пересчитать</button>
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Задача</th>
+            <th>Время (ч)</th>
+            <th>Важность</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.Weight</td>
+                <td>@item.Value</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="mt-3">
+    <strong>Итоговое время: @Model.Sum(t => t.Weight) ч.</strong> <br />
+    <strong>Общая ценность: @Model.Sum(t => t.Value) баллов</strong>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Назад к списку</a>
