@@ -6,10 +6,26 @@
 
 <h1>Index</h1>
 
+<div class="card mb-4 border-primary">
+    <div class="card-body">
+        <h5 class="card-title">Сформировать план на день</h5>
+        <form asp-action="Plan" method="get" class="row g-3">
+            <div class="col-auto">
+                <label class="visually-hidden">Часы</label>
+                <input type="number" name="hours" class="form-control" placeholder="Сколько часов есть?" value="8">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-success">Рассчитать алгоритмом</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table table-hover">
     <thead>
         <tr>
             <th>
@@ -27,12 +43,18 @@
             <th>
                 @Html.DisplayNameFor(model => model.IsCompleted)
             </th>
-            <th></th>
+            <th>
+                Эффективность (V/W)
+                </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsCompleted)
+                </th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+            double efficiency = item.Weight > 0 ? (double)item.Value / item.Weight : 0;
+            <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
@@ -49,9 +71,21 @@
                 @Html.DisplayFor(modelItem => item.IsCompleted)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <span class="badge @(item.Value > 7 ? "bg-danger" : "bg-primary")">
+                        /* Цвет зависит от ценности: красный для высоких, синий для остальных */
+                    @item.Value
+                </span>
+            </td>
+            <td>
+                @efficiency.ToString("F2")
+            </td>
+                <td>
+                    <input type="checkbox" class="form-check-input" checked="@item.IsCompleted" disabled />/* Чекбокс для отображения статуса выполнения, отключённый для редактирования */
+                </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Редактировать</a>
+                <a asp-action="Details" asp-route-id="@item.Id">Детали</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Удалить</a>
             </td>
         </tr>
 }
