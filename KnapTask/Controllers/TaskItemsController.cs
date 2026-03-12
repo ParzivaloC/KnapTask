@@ -21,12 +21,24 @@ namespace KnapTask.Controllers
             _context = context;
             _optimizationService = optimizationService;
         }
-        
+
 
         // GET: TaskItems
+        // Считываем все задачи из базы данных, рассчитываем процент выполнения и статистику по важности, затем передаем эти данные в представление для отображения(Подготовка данных в Контроллере)
         public async Task<IActionResult> Index()
         {
-            return View(await _context.TaskItems.ToListAsync());
+            var tasks = await _context.TaskItems.ToListAsync(); // считываем все задачи из базы данных
+            
+            int totalCount = tasks.Count;
+            int completedCount = tasks.Count(t => t.IsCompleted);
+            ViewBag.ProgressPercent = totalCount > 0 ? (int)((double)completedCount / totalCount * 100) : 0; // передаем процент выполнения в ViewBag для отображения в представлении
+
+            var stats = tasks.GroupBy(t => t.Value).Select(g => new {Priority = g.Key, Count = g.Count()}).OrderBy(g => g.Priority).ToList(); // группируем задачи по важности и считаем количество задач для каждой важности, затем сортируем по важности
+
+            ViewBag.StatLabels = stats.Select(s => $"Важность {s.Priority}").ToArray();
+            ViewBag.StatData = stats.Select(s => s.Count).ToArray();
+
+            return View(tasks);
         }
 
         // GET: TaskItems/Details/5
