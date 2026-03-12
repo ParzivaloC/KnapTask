@@ -41,6 +41,23 @@ namespace KnapTask.Controllers
             return View(tasks);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            var taskItem = await _context.TaskItems.FindAsync(id);
+            if (taskItem == null)
+            {
+                return NotFound();
+            }
+            taskItem.IsCompleted = !taskItem.IsCompleted; // переключаем статус выполнения
+            _context.Update(taskItem);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+
         // GET: TaskItems/Details/5
         public async Task<IActionResult> Details(int? id)
         {
