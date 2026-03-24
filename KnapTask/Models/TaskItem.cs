@@ -23,5 +23,7 @@ namespace KnapTask.Models
 
         [Display(Name = "Выполнено")]
         public bool IsCompleted { get; set; } = false;
+
+        public string Category { get; set; } = "Другое";
     }
 }

@@ -98,6 +98,21 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+
+
+<div class="row mt-5">
+    <div class="col-md-6">
+        <h3>Анализ приоритетов</h3>
+        <canvas id="priorityChart"></canvas>
+    </div>
+
+    <div class="col-md-6">
+        <h3>Затраты времени по категориям</h3>
+        <canvas id="categoryPieChart"></canvas>
+    </div>
+</div>
+
+
 <script>
     const ctx = document.getElementById('priorityChart').getContext('2d');
     new Chart(ctx, {
@@ -125,4 +140,19 @@
     }
     }
     });
+
+    const ctxPie = document.getElementById('categoryPieChart').getContext('2d');
+    new Chart(ctxPie, {
+    type: 'pie',
+    data: {
+    labels: @Html.Raw(Json.Serialize(ViewBag.CategoryLabels)),
+    datasets: [{
+    data: @Html.Raw(Json.Serialize(ViewBag.CategoryData)),
+    backgroundColor: [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'
+    ]
+    }]
+    }
+    });
+
 </script>

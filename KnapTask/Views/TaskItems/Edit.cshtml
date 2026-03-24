@@ -49,6 +49,17 @@
     <a asp-action="Index">Вернуться к списку</a>
 </div>
 
+<div class="form-group mb-3">
+    <label class="control-label">Категория</label>
+    <select asp-for="Category" class="form-control">
+        <option value="Учеба">Учеба</option>
+        <option value="Работа">Работа</option>
+        <option value="Личное">Личное</option>
+        <option value="Спорт">Спорт</option>
+        <option value="Другое">Другое</option>
+    </select>
+</div>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

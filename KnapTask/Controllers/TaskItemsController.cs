@@ -27,16 +27,26 @@ namespace KnapTask.Controllers
         // Считываем все задачи из базы данных, рассчитываем процент выполнения и статистику по важности, затем передаем эти данные в представление для отображения(Подготовка данных в Контроллере)
         public async Task<IActionResult> Index()
         {
-            var tasks = await _context.TaskItems.ToListAsync(); // считываем все задачи из базы данных
-            
+            var tasks = await _context.TaskItems.ToListAsync();
+
+            // 1. Прогресс-бар (оставляем как было)
             int totalCount = tasks.Count;
             int completedCount = tasks.Count(t => t.IsCompleted);
-            ViewBag.ProgressPercent = totalCount > 0 ? (int)((double)completedCount / totalCount * 100) : 0; // передаем процент выполнения в ViewBag для отображения в представлении
+            ViewBag.ProgressPercent = totalCount > 0 ? (int)((double)completedCount / totalCount * 100) : 0;
 
-            var stats = tasks.GroupBy(t => t.Value).Select(g => new {Priority = g.Key, Count = g.Count()}).OrderBy(g => g.Priority).ToList(); // группируем задачи по важности и считаем количество задач для каждой важности, затем сортируем по важности
+            // 2. Данные для столбчатого графика (Важность)
+            var priorityStats = tasks.GroupBy(t => t.Value)
+                                     .Select(g => new { Priority = g.Key, Count = g.Count() })
+                                     .OrderBy(g => g.Priority).ToList();
+            ViewBag.StatLabels = priorityStats.Select(s => $"Важность {s.Priority}").ToArray();
+            ViewBag.StatData = priorityStats.Select(s => s.Count).ToArray();
 
-            ViewBag.StatLabels = stats.Select(s => $"Важность {s.Priority}").ToArray();
-            ViewBag.StatData = stats.Select(s => s.Count).ToArray();
+            // 3. НОВОЕ: Данные для круговой диаграммы (Распределение времени по категориям)
+            var categoryStats = tasks.GroupBy(t => t.Category)
+                                     .Select(g => new { Category = g.Key, TotalWeight = g.Sum(t => t.Weight) })
+                                     .ToList();
+            ViewBag.CategoryLabels = categoryStats.Select(c => c.Category).ToArray();
+            ViewBag.CategoryData = categoryStats.Select(c => c.TotalWeight).ToArray();
 
             return View(tasks);
         }
