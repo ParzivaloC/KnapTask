@@ -92,12 +92,13 @@ namespace KnapTask.Controllers
             return View();
         }
 
-        // POST: TaskItems/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,Weight,Value,IsCompleted")] TaskItem taskItem)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description,Weight,Value,IsCompleted,Category")] TaskItem taskItem)
         {
             if (ModelState.IsValid)
             {
@@ -108,7 +109,7 @@ namespace KnapTask.Controllers
             return View(taskItem);
         }
 
-        // GET: TaskItems/Edit/5
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -124,9 +125,11 @@ namespace KnapTask.Controllers
             return View(taskItem);
         }
 
-        // POST: TaskItems/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Weight,Value,IsCompleted")] TaskItem taskItem)
