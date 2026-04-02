@@ -54,13 +54,11 @@ namespace KnapTask.Controllers
         [HttpPost]
         public async Task<IActionResult> ToggleStatus(int id)
         {
-            var taskItem = await _context.TaskItems.FindAsync(id);
-            if (taskItem == null)
-            {
-                return NotFound();
-            }
-            taskItem.IsCompleted = !taskItem.IsCompleted; // переключаем статус выполнения
-            _context.Update(taskItem);
+            // Используй то имя, которое у тебя в контексте (TaskItems или Tasks)
+            var task = await _context.TaskItems.FindAsync(id);
+            if (task == null) return NotFound();
+
+            task.IsCompleted = !task.IsCompleted;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -109,19 +107,15 @@ namespace KnapTask.Controllers
             return View(taskItem);
         }
 
-
+        // получаем задачу по ID, передаем её в представление для редактирования. Если задачи нет - возвращаем 404
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
+            if (id == null) return NotFound();
+            
             var taskItem = await _context.TaskItems.FindAsync(id);
-            if (taskItem == null)
-            {
-                return NotFound();
-            }
+
+            if (taskItem == null) return NotFound();
+            
             return View(taskItem);
         }
 
@@ -129,10 +123,10 @@ namespace KnapTask.Controllers
 
 
 
-
+        // получаем отредактированную задачу, проверяем её ID на совпадение с переданным, сохраняем изменения. Если задачи нет - возвращаем 404
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Weight,Value,IsCompleted")] TaskItem taskItem)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Weight,Value,IsCompleted,Category")] TaskItem taskItem)
         {
             if (id != taskItem.Id)
             {
@@ -145,6 +139,7 @@ namespace KnapTask.Controllers
                 {
                     _context.Update(taskItem);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -157,7 +152,7 @@ namespace KnapTask.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
             return View(taskItem);
         }
@@ -170,8 +165,8 @@ namespace KnapTask.Controllers
                 return NotFound();
             }
 
-            var taskItem = await _context.TaskItems
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var taskItem = await _context.TaskItems.FindAsync(id);
+
             if (taskItem == null)
             {
                 return NotFound();

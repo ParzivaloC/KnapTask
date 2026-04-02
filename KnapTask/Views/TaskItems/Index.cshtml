@@ -67,6 +67,7 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
+                        // Объявляем переменные ВНУТРИ цикла, чтобы они были доступны для каждой строки
                         double efficiency = item.Weight > 0 ? (double)item.Value / item.Weight : 0;
                         string badgeColor = item.Category switch
                         {
@@ -80,21 +81,17 @@
                             <td class="fw-bold">@item.Title</td>
                             <td><span class="badge @badgeColor">@item.Category</span></td>
                             <td class="text-center">@item.Weight</td>
-                            <td class="text-center"><span class="badge bg-light text-primary border">@item.Value</span></td>
+                            <td class="text-center">@item.Value</td>
                             <td class="text-center fw-bold text-info">@efficiency.ToString("F2")</td>
                             <td class="text-center">
                                 <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post">
-                                    <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-outline-secondary") w-100">
-                                        <i class="bi @(item.IsCompleted ? "bi-check-circle" : "bi-circle")"></i>
+                                    <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-outline-secondary")">
                                         @(item.IsCompleted ? "Готово" : "В процессе")
                                     </button>
                                 </form>
                             </td>
                             <td class="text-end">
-                                <div class="btn-group">
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
-                                </div>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">изм.</a>
                             </td>
                         </tr>
                     }
