@@ -35,3 +35,14 @@ app.MapControllerRoute(
     pattern: "{controller=TaskItems}/{action=Index}/{id?}");
 
 app.Run();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // Кэшировать статику на 30 дней
+        const int durationInSeconds = 60 * 60 * 24 * 30;
+        ctx.Context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.CacheControl] =
+            "public,max-age=" + durationInSeconds;
+    }
+});

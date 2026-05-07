@@ -52,46 +52,39 @@
 
     <div class="card shadow-sm border-0 mb-5">
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+            <table class="table">
+                <thead>
                     <tr>
                         <th>Задача</th>
                         <th>Категория</th>
-                        <th class="text-center">Часы</th>
-                        <th class="text-center">Важность</th>
-                        <th class="text-center">V/W</th>
-                        <th class="text-center">Статус</th>
-                        <th class="text-end">Действия</th>
+                        <th>Вес</th>
+                        <th>Ценность</th>
+                        <th>Эффективность</th>
+                        <th>Статус</th>
+                        <th>Действия</th> 
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        // Объявляем переменные ВНУТРИ цикла, чтобы они были доступны для каждой строки
-                        double efficiency = item.Weight > 0 ? (double)item.Value / item.Weight : 0;
-                        string badgeColor = item.Category switch
-                        {
-                            "Учеба" => "bg-info",
-                            "Работа" => "bg-warning text-dark",
-                            "Спорт" => "bg-danger",
-                            _ => "bg-secondary"
-                        };
-
                         <tr>
-                            <td class="fw-bold">@item.Title</td>
-                            <td><span class="badge @badgeColor">@item.Category</span></td>
-                            <td class="text-center">@item.Weight</td>
-                            <td class="text-center">@item.Value</td>
-                            <td class="text-center fw-bold text-info">@efficiency.ToString("F2")</td>
-                            <td class="text-center">
-                                <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post">
+                            <td>@item.Title</td>
+                            <td>@item.Category</td>
+                            <td>@item.Weight</td>
+                            <td>@item.Value</td>
+                            <td>@((item.Weight > 0 ? (double)item.Value / item.Weight : 0).ToString("F2"))</td>
+                            <td>
+                                @* Форма статуса *@
+                                <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" style="display:inline;">
                                     <button type="submit" class="btn btn-sm @(item.IsCompleted ? "btn-success" : "btn-outline-secondary")">
                                         @(item.IsCompleted ? "Готово" : "В процессе")
                                     </button>
                                 </form>
                             </td>
-                            <td class="text-end">
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">изм.</a>
+                            <td>
+                                
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-info">Изм.</a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Удалить</a>
                             </td>
                         </tr>
                     }

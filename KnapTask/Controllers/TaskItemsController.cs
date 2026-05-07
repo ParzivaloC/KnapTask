@@ -41,7 +41,6 @@ namespace KnapTask.Controllers
             ViewBag.StatLabels = priorityStats.Select(s => $"Важность {s.Priority}").ToArray();
             ViewBag.StatData = priorityStats.Select(s => s.Count).ToArray();
 
-            // 3. НОВОЕ: Данные для круговой диаграммы (Распределение времени по категориям)
             var categoryStats = tasks.GroupBy(t => t.Category)
                                      .Select(g => new { Category = g.Key, TotalWeight = g.Sum(t => t.Weight) })
                                      .ToList();
@@ -54,7 +53,7 @@ namespace KnapTask.Controllers
         [HttpPost]
         public async Task<IActionResult> ToggleStatus(int id)
         {
-            // Используй то имя, которое у тебя в контексте (TaskItems или Tasks)
+            
             var task = await _context.TaskItems.FindAsync(id);
             if (task == null) return NotFound();
 
@@ -65,8 +64,6 @@ namespace KnapTask.Controllers
 
 
 
-
-        // GET: TaskItems/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -84,14 +81,10 @@ namespace KnapTask.Controllers
             return View(taskItem);
         }
 
-        // GET: TaskItems/Create
         public IActionResult Create()
         {
             return View();
         }
-
-
-
 
 
         [HttpPost]
@@ -118,9 +111,6 @@ namespace KnapTask.Controllers
             
             return View(taskItem);
         }
-
-
-
 
 
         // получаем отредактированную задачу, проверяем её ID на совпадение с переданным, сохраняем изменения. Если задачи нет - возвращаем 404
@@ -157,7 +147,7 @@ namespace KnapTask.Controllers
             return View(taskItem);
         }
 
-        // GET: TaskItems/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -175,7 +165,7 @@ namespace KnapTask.Controllers
             return View(taskItem);
         }
 
-        // POST: TaskItems/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -195,7 +185,6 @@ namespace KnapTask.Controllers
             return _context.TaskItems.Any(e => e.Id == id);
         }
 
-        
         public async Task<IActionResult> Plan(int hours = 8)
         {
             var allTasks = await _context.TaskItems.ToListAsync();
