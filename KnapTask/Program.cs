@@ -1,5 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using KnapTask.Data;
+using KnapTask.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddScoped<KnapTask.Services.OptimizationService>();
+builder.Services.AddScoped<ITaskOptimizationService, OptimizationService>();
 
 var app = builder.Build();
 

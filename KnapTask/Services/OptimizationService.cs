@@ -1,8 +1,9 @@
 ﻿using KnapTask.Models;
+using KnapTask.Models.ViewModel;
 
 namespace KnapTask.Services
 {
-    public class OptimizationService
+    public class OptimizationService : ITaskOptimizationService
     {
         public List<TaskItem> GetOptimizedPlan(List<TaskItem> allTasks , int maxHours) 
         { 
@@ -45,7 +46,21 @@ namespace KnapTask.Services
             }
 
             return result;
-
         }
+
+        //метод для преобразования списка TaskItem в список TaskItemViewModel, который будет использоваться для отображения данных в пользовательском интерфейсе
+        public IEnumerable<TaskItemViewModel> MapToViewModel(IEnumerable<TaskItem> tasks)
+        {
+            return tasks.Select(t => new TaskItemViewModel
+            {
+                Id = t.Id,
+                Title = t.Title,
+                Category = t.Category,
+                Weight = t.Weight,
+                Value = t.Value,
+                IsCompleted = t.IsCompleted
+            });
+        }
+
     }
 }

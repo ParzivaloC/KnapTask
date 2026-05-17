@@ -1,4 +1,4 @@
-﻿@model IEnumerable<KnapTask.Models.TaskItem>
+﻿@model IEnumerable<dynamic>
 
 @{
     ViewData["Title"] = "Твои Задачи";
@@ -52,16 +52,16 @@
 
     <div class="card shadow-sm border-0 mb-5">
         <div class="table-responsive">
-            <table class="table">
-                <thead>
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
                     <tr>
                         <th>Задача</th>
                         <th>Категория</th>
-                        <th>Вес</th>
-                        <th>Ценность</th>
-                        <th>Эффективность</th>
-                        <th>Статус</th>
-                        <th>Действия</th> 
+                        <th class="text-center">Затраты (ч)</th>
+                        <th class="text-center">Ценность</th>
+                        <th class="text-center">Эффективность</th>
+                        <th class="text-center">Статус</th>
+                        <th class="text-end">Действия</th>
                     </tr>
                 </thead>
                 <tbody>

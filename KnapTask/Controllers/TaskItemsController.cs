@@ -14,9 +14,9 @@ namespace KnapTask.Controllers
     public class TaskItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly OptimizationService _optimizationService;
+        private readonly ITaskOptimizationService _optimizationService;
 
-        public TaskItemsController(ApplicationDbContext context, OptimizationService optimizationService)
+        public TaskItemsController(ApplicationDbContext context, ITaskOptimizationService optimizationService)
         {
             _context = context;
             _optimizationService = optimizationService;
@@ -29,25 +29,44 @@ namespace KnapTask.Controllers
         {
             var tasks = await _context.TaskItems.ToListAsync();
 
-            // 1. Прогресс-бар (оставляем как было)
+            // Прогресс-бар
             int totalCount = tasks.Count;
             int completedCount = tasks.Count(t => t.IsCompleted);
             ViewBag.ProgressPercent = totalCount > 0 ? (int)((double)completedCount / totalCount * 100) : 0;
 
-            // 2. Данные для столбчатого графика (Важность)
+
+
+
+            // Данные для столбчатого графика (Важность)
             var priorityStats = tasks.GroupBy(t => t.Value)
                                      .Select(g => new { Priority = g.Key, Count = g.Count() })
                                      .OrderBy(g => g.Priority).ToList();
             ViewBag.StatLabels = priorityStats.Select(s => $"Важность {s.Priority}").ToArray();
             ViewBag.StatData = priorityStats.Select(s => s.Count).ToArray();
 
+
+
+            // Данные для круговой диаграммы (Категории)
             var categoryStats = tasks.GroupBy(t => t.Category)
                                      .Select(g => new { Category = g.Key, TotalWeight = g.Sum(t => t.Weight) })
                                      .ToList();
             ViewBag.CategoryLabels = categoryStats.Select(c => c.Category).ToArray();
             ViewBag.CategoryData = categoryStats.Select(c => c.TotalWeight).ToArray();
 
+
+
             return View(tasks);
+        }
+
+        // Получаем все задачи, передаем их в сервис оптимизации для получения оптимального плана, затем отображаем этот план в представлении
+        public async Task<IActionResult> OptimizedPlan(int maxCapacity = 8)
+        {
+            var allTasks = await _context.TaskItems.ToListAsync();
+            var optimizedTasks = _optimizationService.GetOptimizedPlan(allTasks, maxCapacity);
+            var viewModels = _optimizationService.MapToViewModel(optimizedTasks);
+
+            ViewBag.MaxCapacity = maxCapacity;
+            return View("Index", viewModels);
         }
 
         [HttpPost]
@@ -113,7 +132,7 @@ namespace KnapTask.Controllers
         }
 
 
-        // получаем отредактированную задачу, проверяем её ID на совпадение с переданным, сохраняем изменения. Если задачи нет - возвращаем 404
+        // получаем ОТРЕДАЧЕНУЮ задачу, проверяем её ID на совпадение с переданным, сохраняем изменения. Если задачи нет - возвращаем 404
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Weight,Value,IsCompleted,Category")] TaskItem taskItem)
@@ -164,8 +183,8 @@ namespace KnapTask.Controllers
 
             return View(taskItem);
         }
+        // получаем задачу по ID, удаляем её из базы данных. Если задачи нет возвращаем 404
 
-        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -179,12 +198,12 @@ namespace KnapTask.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+        // Вспомогательный метод для проверки существования задачи по ID, используется в методе Edit для обработки ошибок конкурентного обновления
         private bool TaskItemExists(int id)
         {
             return _context.TaskItems.Any(e => e.Id == id);
         }
-
+        
         public async Task<IActionResult> Plan(int hours = 8)
         {
             var allTasks = await _context.TaskItems.ToListAsync();
